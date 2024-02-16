@@ -1,0 +1,39 @@
+select {prod_type1_ser} as prod_type1_ser,
+    {model_ser} as model_ser,
+    {from_date} as from_date,
+    {to_date} as to_date,
+    a.product_store_id,
+    a.po_no,
+    a.serial_id,
+    a.item_cd,
+    item.prod_type1,
+    item.carcass_cd,
+    item.sales_cd,
+    b.machine_no,
+    b.built_no,
+    b.engine_no,
+    a.store_qty,
+    a.box_qty,
+    a.store_date,
+    b.invoice_date,
+    a.user_id,
+    wh.wh_nm,
+    a.platform_type,
+    a.createuser,
+    date(a.createdate) as createdate ,
+    user.USERNAME,
+    a.delv_file,
+    a.delv_file as delv_file_nm,
+    a.remark,
+    '' pdf_file
+from tb_product_store a
+left join vw_ma_item item on item.item_cd = a.item_cd
+left join tb_product_serial b on b.serial_id = a.serial_id
+left join vw_cm_usermaster user on user.UID = a.user_id
+left join tb_ma_wh wh on wh.wh_cd = a.wh_cd
+
+where 1 = 1 
+and (ifnull({prod_type1_ser},'') = '' or {prod_type1_ser} = item.prod_type1)
+and (ifnull({model_ser}, '') = '' or item.carcass_cd like concat('%', {model_ser}, '%') or item.sales_cd like concat('%', {model_ser}, '%'))
+and (ifnull({from_date},'') = '' or a.store_date >= {from_date})
+and (ifnull({to_date},'') = '' or a.store_date <= {to_date})
